@@ -20,6 +20,24 @@ produces:
 paths:
   /basic/{id}:
     x-swagger-router-controller: basic
+    get:
+      description: get a profile
+      operationId: findOne
+      parameters:
+        - in: path
+          name: id
+          description: get by id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema: 
+            $ref: "#/definitions/User"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     delete:
       description: delete a profile
       operationId: deleteOne

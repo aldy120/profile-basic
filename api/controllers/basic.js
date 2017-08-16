@@ -45,9 +45,13 @@ var ObjectID = require('mongodb').ObjectID
 var db = require('../helpers/db');
 function findAll(req, res) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  db.findAll().then(result => res.json(result));
+  db.findAll({}).then(result => res.json(result));
 }
-
+function findOne(req, res) {
+  var filter = {};
+  filter._id = new ObjectID(req.swagger.params.id.value);
+  db.findAll(filter).then(result => res.json(result[0]));
+}
 function insertOne(req, res) {
   var document = req.swagger.params.body.value;
   db.insertOne(document);
@@ -80,8 +84,6 @@ function deleteOne(req, res) {
   db.deleteOne(filter);
   res.json({message: 'success'})
 }
-
-function findOne(req, res) { }
 
 
 function test(req, res) {
