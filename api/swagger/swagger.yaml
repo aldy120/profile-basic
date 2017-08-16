@@ -125,6 +125,28 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /weather:
+    x-swagger-router-controller: weather
+    get:
+      description: "Returns current weather in the specified city to the caller"
+      operationId: getWeatherByCity
+      parameters:
+        - name: city
+          in: query
+          description: "The city you want weather for in the form city,state,country"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions

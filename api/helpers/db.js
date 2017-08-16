@@ -5,9 +5,9 @@ var MongoClient = require('mongodb').MongoClient,
 var uri = 'mongodb://aldy120:53U8bRoOrNVnO4N0@cluster0-shard-00-00-hyjpb.mongodb.net:27017,cluster0-shard-00-01-hyjpb.mongodb.net:27017,cluster0-shard-00-02-hyjpb.mongodb.net:27017/profile?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 var collectionName = 'basic';
 
-
 function insertOne(document) {
   co(function* () {
+
     // Connection URL
     var db = yield MongoClient.connect(uri);
     console.log("Connected correctly to server");
@@ -26,6 +26,7 @@ function insertOne(document) {
 // { a: 1 }, { $set: { b: 1 } }
 function updateOne(filter, instruction) {
   co(function* () {
+
     // Connection URL
     var db = yield MongoClient.connect(uri);
     console.log("Connected correctly to server");
@@ -46,6 +47,7 @@ function updateOne(filter, instruction) {
 
 function deleteOne(filter) {
   co(function* () {
+    
     // Connection URL
     var db = yield MongoClient.connect(uri);
     console.log("Connected correctly to server");
@@ -65,10 +67,11 @@ function deleteOne(filter) {
 
 function findAll() {
   return co(function* () {
+    
     // Connection URL
     var db = yield MongoClient.connect(uri);
     console.log("Connected correctly to server");
-
+    
     // Get the collection
     var col = db.collection(collectionName);
 
