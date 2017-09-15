@@ -1,15 +1,4 @@
 'use strict';
-/*
- 'use strict' is not required but helpful for turning syntactical errors into true errors in the program flow
- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
-*/
-
-/*
- Modules make it possible to import JavaScript files into your application.  Modules are imported
- using 'require' statements that give you a reference to the module.
-
-  It is a good idea to list the modules that your application depends on in the package.json in the project root
- */
 var util = require('util');
 
 /*
@@ -42,50 +31,82 @@ module.exports = {
   Param 2: a handle to the response object
  */
 var ObjectID = require('mongodb').ObjectID
-var db = require('../helpers/db');
+var db = require('../helpers/db')('basic');
+var validateMongoId = require('../helpers/validateMongoId');
+
 function findAll(req, res) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  db.findAll({}).then(result => res.json(result));
+  db.findAll({}).then(result => {
+    if (!result) {
+      res.json([]);
+    }
+    res.json(result);
+  });
 }
 function findOne(req, res) {
+  var id = req.swagger.params.id.value;
+  if (!validateMongoId(id)) {
+    res.status(400).json({
+      message: 'Format error'
+    });
+    return;
+  }
   var filter = {};
-  filter._id = new ObjectID(req.swagger.params.id.value);
-  db.findAll(filter).then(result => res.json(result[0]));
+  filter._id = new ObjectID(id);
+  db.findAll(filter).then(result => {
+    if (result.length === 0) {
+      res.status(404).json({
+        message: 'Not Found'
+      });
+    } else {
+      res.json(result[0]);
+    }
+  });
 }
 function insertOne(req, res) {
   var document = req.swagger.params.body.value;
-  db.insertOne(document);
-  res.json({message: 'Success'});
+  db.insertOne(document).then(result => res.json(result.ops[0]));
 }
-
 function updateOne(req, res) {
-  // var body = req.swagger.params.body.value;
-  // var filter = body.filter;
-  // filter._id = new ObjectID(filter._id);
-  // var updated = body.updated;
-  // var instruction = {
-  //   $set: updated
-  // }
-  // db.updateOne(filter, instruction);
+  var id = req.swagger.params.id.value;
+  if (!validateMongoId(id)) {
+    res.status(400).json({
+      message: 'Format error'
+    });
+    return;
+  }
   var filter = {};
-  filter._id = new ObjectID(req.swagger.params.id.value);
-  console.log('get id');
+  filter._id = new ObjectID(id);
   var updated = req.swagger.params.body.value;
   var instruction = {
     $set: updated
   }
-  db.updateOne(filter, instruction);
-  res.json({message: 'Success'});
-}
+  db.updateOne(filter, instruction).then(result => {
+    if (!result.value) {
+      res.status(404).json({
+        message: 'Not found'
+      });
+      return;
+    }
+    res.json(result.value);
+  });
 
+}
 function deleteOne(req, res) {
+  var id = req.swagger.params.id.value;
+  if (!validateMongoId(id)) {
+    res.status(400).json({
+      message: 'Format error'
+    });
+    return;
+  }
   var filter = {};
-  filter._id = new ObjectID(req.swagger.params.id.value);
-  db.deleteOne(filter);
-  res.json({message: 'success'})
+  filter._id = new ObjectID(id);
+  db.deleteOne(filter).then(document => {
+    document ? res.json(document) : res.json({});
+  });
 }
-
 
 function test(req, res) {
-  res.json({message: 'test'})
+  res.json({ message: 'test' })
 }
